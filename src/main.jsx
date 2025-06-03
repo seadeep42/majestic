@@ -4,7 +4,7 @@ import Sidebar from "./sidebar";
 import Map from "./map";
 
 // CSS imports
-import "mapbox-gl/dist/mapbox-gl.css";
+import "maplibre-gl/dist/maplibre-gl.css";
 import "./index.css";
 
 const App = () => {

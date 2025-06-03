@@ -1,4 +1,3 @@
-export const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
 import { filter, map, sortBy, toLower, uniqBy } from "lodash";
 import MajesticRawData from "./platforms-majestic.json";
 

@@ -1,6 +1,5 @@
 import React, { useEffect } from "react";
-import mapboxgl from "mapbox-gl";
-import { MAPBOX_TOKEN } from "./constants";
+import maplibregl from "maplibre-gl";
 import { platformCoordinates } from "./constants";
 import { map } from "lodash";
 
@@ -8,29 +7,24 @@ const mapCenter = [77.57236262183821, 12.978029893890145];
 const southWestCorner = [77.57109651389204, 12.97732048536717];
 const northEastCorner = [77.57359576840287, 12.978696550289667];
 
-mapboxgl.accessToken = MAPBOX_TOKEN;
-
 class Map extends React.PureComponent {
   constructor(props) {
     super(props);
-    this.mapboxInstance = null;
+    this.mapInstance = null;
   }
 
   componentDidMount() {
-    const mapboxInstance = new mapboxgl.Map({
+    const mapInstance = new maplibregl.Map({
       container: this.mapContainer,
-      style: "mapbox://styles/mapbox/light-v11",
+      style: "https://tiles.openfreemap.org/styles/liberty",
       center: mapCenter,
       minZoom: 17,
     });
-    mapboxInstance.fitBounds([southWestCorner, northEastCorner]);
-    this.mapboxInstance = mapboxInstance;
+    mapInstance.fitBounds([southWestCorner, northEastCorner]);
+    this.mapInstance = mapInstance;
 
     this.onMapLoad(() => {
-      // mapboxInstance.on("zoom", () => {
-      //   console.log(mapboxInstance.getZoom());
-      // });
-      mapboxInstance.addSource("platforms", {
+      mapInstance.addSource("platforms", {
         type: "geojson",
         data: {
           type: "FeatureCollection",
@@ -47,25 +41,28 @@ class Map extends React.PureComponent {
         },
       });
 
-      mapboxInstance.addLayer({
-        id: "circle-layer",
+      mapInstance.addLayer({
+        id: "platform-circles",
         type: "circle",
         source: "platforms",
         paint: {
-          "circle-radius": 12,
+          "circle-radius": 14,
           "circle-color": "#4a89f3",
-          "line-border-color": "white",
+          "circle-stroke-color": "white",
+          "circle-stroke-width": 2,
         },
       });
 
-      mapboxInstance.addLayer({
-        id: "symbol-layer",
+      mapInstance.addLayer({
+        id: "text-layer",
         type: "symbol",
         source: "platforms",
         layout: {
           "text-field": ["get", "title"],
-          "text-size": 11,
-          "text-font": ["Open Sans Bold", "Arial Unicode MS Bold"],
+          "text-font": ["Noto Sans Regular"],
+          "text-offset": [0, 0],
+          "text-size": 14,
+          "text-allow-overlap": true,
           "text-anchor": "center",
         },
         paint: {
@@ -76,16 +73,16 @@ class Map extends React.PureComponent {
   }
 
   onMapLoad = (fn) => {
-    if (this.mapboxInstance._loaded) {
+    if (this.mapInstance._loaded) {
       fn();
     } else {
-      this.mapboxInstance.on("load", fn);
+      this.mapInstance.on("load", fn);
     }
   };
 
   componentWillUnmount() {
-    this.mapboxInstance.remove();
-    this.mapboxInstance = null;
+    this.mapInstance.remove();
+    this.mapInstance = null;
   }
 
   render() {
